@@ -8,4 +8,5 @@ class Filterm3uApplication
 
 fun main(args: Array<String>) {
 	runApplication<Filterm3uApplication>(*args)
+	println("--------------------------------------")
 }

@@ -13,6 +13,7 @@ import william.miranda.filterm3u.business.Downloader
 import william.miranda.filterm3u.business.Encoder
 import william.miranda.filterm3u.business.Parser
 import java.util.*
+import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping(value = ["/api"])
@@ -29,8 +30,12 @@ class Controller @Autowired constructor(
         @RequestParam("url") url: String?,
         @RequestParam("category") category: List<String>?,
         @RequestParam("name") name: List<String>?,
-        @RequestParam("blacklist") blacklist: List<String>?
+        @RequestParam("blacklist") blacklist: List<String>?,
+        request: HttpServletRequest
     ): ResponseEntity<String> {
+
+        println("Got request from: ${request.remoteAddr}")
+
         if (url == null) {
             return ResponseEntity
                 .ok()
@@ -39,12 +44,20 @@ class Controller @Autowired constructor(
         }
 
         val channels = downloader.download(url)
+
+        println("Got ${channels.size} channels")
+        println("Applying Filters:\ncategory=$category\nname=$name\nblacklist=$blacklist")
+
         val parsed = parser.parse(
             channels = channels,
             channelCategory = category,
             channelName = name,
             blacklist = blacklist
         )
+
+        println("Returned ${parsed.size} channels")
+        println("--------------------------------------")
+
         val response = encoder.encode(parsed)
 
         return ResponseEntity.ok(response)
